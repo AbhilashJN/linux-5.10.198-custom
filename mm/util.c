@@ -546,6 +546,29 @@ unsigned long vm_mmap_pgoff(struct file *file, unsigned long addr,
 	return ret;
 }
 
+unsigned long vm_mmap_pgoff_contig1(struct file *file, unsigned long addr,
+	unsigned long len, unsigned long prot,
+	unsigned long flag, unsigned long pgoff, unsigned long contig_flags)
+{
+	unsigned long ret;
+	struct mm_struct *mm = current->mm;
+	unsigned long populate;
+	LIST_HEAD(uf);
+
+	ret = security_mmap_file(file, prot, flag);
+	if (!ret) {
+		if (mmap_write_lock_killable(mm))
+			return -EINTR;
+		ret = do_mmap_contig1(file, addr, len, prot, flag, pgoff, &populate,
+			      &uf, contig_flags);
+		mmap_write_unlock(mm);
+		userfaultfd_unmap_complete(mm, &uf);
+		if (populate)
+			mm_populate(ret, populate);
+	}
+	return ret;
+}
+
 unsigned long vm_mmap(struct file *file, unsigned long addr,
 	unsigned long len, unsigned long prot,
 	unsigned long flag, unsigned long offset)

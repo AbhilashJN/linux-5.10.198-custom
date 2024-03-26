@@ -97,6 +97,22 @@ out:
 	return error;
 }
 
+SYSCALL_DEFINE6(mmap_contig1, unsigned long, addr, unsigned long, len,
+		unsigned long, prot, unsigned long, flags,
+		unsigned long, off, unsigned long, contig_flags)
+{
+	long error;
+	error = -EINVAL;
+	if (off & ~PAGE_MASK)
+		goto out;
+	
+	unsigned long fd;
+	fd = -1;
+	error = ksys_mmap_pgoff_contig1(addr, len, prot, flags, fd, off >> PAGE_SHIFT, contig_flags);
+out:
+	return error;
+}
+
 static void find_start_end(unsigned long addr, unsigned long flags,
 		unsigned long *begin, unsigned long *end)
 {
