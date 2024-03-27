@@ -334,7 +334,7 @@ struct vm_area_struct {
 	 */
 	pgprot_t vm_page_prot;
 	unsigned long vm_flags;		/* Flags, see mm.h. */
-
+	unsigned long contig_flags;
 	/*
 	 * For areas with an address space and backing store,
 	 * linkage into the address_space->i_mmap interval tree.

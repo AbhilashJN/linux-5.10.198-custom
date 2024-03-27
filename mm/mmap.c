@@ -1046,6 +1046,8 @@ static inline int is_mergeable_vma(struct vm_area_struct *vma,
 		return 0;
 	if (!is_mergeable_vm_userfaultfd_ctx(vma, vm_userfaultfd_ctx))
 		return 0;
+	if(vma->contig_flags)
+		return 0;
 	return 1;
 }
 
@@ -2229,6 +2231,7 @@ unsigned long mmap_region_contig1(struct file *file, unsigned long addr,
 	vma->vm_flags = vm_flags;
 	vma->vm_page_prot = vm_get_page_prot(vm_flags);
 	vma->vm_pgoff = pgoff;
+	vma->contig_flags = contig_flags;
 
 	if (file) {
 		if (vm_flags & VM_DENYWRITE) {
